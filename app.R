@@ -63,8 +63,17 @@ ui <- fluidPage(
     
     #Sidebar panel
     sidebarPanel(
+
+      tags$button(
+        id = 'close_all',
+        type = "button",
+        class = "btn action-button",
+        onclick = "setTimeout(function(){window.close();},500);",  # close browser
+        "Close window"
+      ),      
+      br(),
       
-      actionButton("restart","Click to start"),
+      actionButton("restart","Start new game"),
       h4(textOutput("preseason")), #preseason forecast
       
       #Input: Selector for number of hours to fish
@@ -280,7 +289,19 @@ server <- function(input,output) {
     #cat("observeEvent-i",iday,"\n")
     #cat("observeEvent-hours",hours,"\n")
   })
-    
+  
+  # close the R session when Chrome closes
+#  shinyServer(function(input, output, session){
+#    session$onSessionEnded(function() {
+#      stopApp()
+#    })
+#  })  
+
+  server = function(input, output) {
+    observe({
+      if (input$close_all > 0) stopApp()                             # stop shiny
+    })
+  }
 
 } #server
 ############################################################################################################
@@ -390,5 +411,6 @@ reset_sim <- function(ndays,rtot_cat,rtot_esc,rarrivals,rabun,rmean_date) {
 
 # Create Shiny app ----
 shinyApp(ui, server)
+#shinyApp(ui, server, session)
 #shinyApp(ui, dummyserver)
 
