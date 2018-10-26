@@ -50,6 +50,9 @@ tot_esc <<- array(data=rep(0.,ndays),dim=ndays)
 tot_cat <<- array(data=rep(0.,ndays),dim=ndays)
 dcatch <<- array(data=rep(0.,ndays),dim=ndays) 
 
+### text for instructions ###
+it1 <- "Instructions"
+it2 <- "Press button"
 
 
 ################# UI #################################################################
@@ -86,8 +89,22 @@ ui <- fluidPage(
       icon("redo-solid.svg",lib="font-awesome"),
       actionButton("nex","Click to set hours",icon=icon("redo-solid.svg")),
       br(),br(),br(),
-      img(src = "SeinersAtCannery.gif",height=200,width=300),
-      
+      #img(src = "SeinersAtCannery.gif",height=200,width=300),
+      # Write Instructions here ##################
+      tags$div(
+        "Instructions:",tags$br(),
+        "Every day, select an amount of fishing time and press 'Click to set hours'",tags$br(),
+        tags$br(),
+        "The top two graphs track fishing time and catch each day",tags$br(),
+        "The third graph keeps track of your total escapement so far",tags$br(),
+        "However, there is a three day lag for fish to reach the counting tower",tags$br(),
+        "So you must wait to see how many fish escaped each day",tags$br(),
+        tags$br(),
+        "At the end of the 30-day season, you will be graded",tags$br(),
+        "Start fishing!"
+       ),
+      ############################################      
+
       #text for end of simulation
       h2(textOutput("simEnd")),
       h4(textOutput("catescEnd")),
@@ -127,6 +144,7 @@ server <- function(input,output) {
   arrivals <<- alist$arrivals
   abun <<- alist$abun
   mean_date <<- alist$mean_date
+ 
   
   observeEvent(input$nex,{
     hours[iday] <<- as.numeric(input$h)
@@ -215,7 +233,7 @@ server <- function(input,output) {
       #output$escScore <- renderText(c("Your escapement score was ",es))
       output$escScore <- renderText(c("Your escapement score was ",slist$scoreH))
       
-      fh <- as.character(format(obs_h,nsmall=0,,big.mark=",",digits=3))
+      fh <- as.character(format(obs_h,nsmall=0,big.mark=",",digits=3))
       output$evenEnd <- renderText(c("weekly escapement scores were ",fh)) 
 
       #vs <- as.character(format(slist$scoreH,nsmall=0,big.mark=",",digits=3))
@@ -291,11 +309,11 @@ server <- function(input,output) {
   })
   
   # close the R session when Chrome closes
-#  shinyServer(function(input, output, session){
-#    session$onSessionEnded(function() {
-#      stopApp()
-#    })
-#  })  
+  shinyServer(function(input, output, session){
+    session$onSessionEnded(function() {
+      stopApp()
+    })
+  })  
 
   server = function(input, output) {
     observe({
